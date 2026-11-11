@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Demo | Bandcast</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="scripts/demo.js" defer></script>
+  </head>
+  <body>
+    <main class="demo-screen" aria-label="Bandcast demo">
+      <div class="dm-column">
+        <aside class="dm-sidebar" aria-label="Direct Messages">
+          <h2 class="dm-heading">Direct Messages</h2>
+          <div class="dm-list" data-dm-list></div>
+        </aside>
+        <section class="profile-dock" aria-label="Profile and controls">
+          <button class="profile-info" type="button" aria-label="Profile for HunterScott323">
+            <div class="profile-avatar" data-avatar-name="Hunter Scott" aria-hidden="true">H</div>
+            <div class="profile-details">
+              <span class="profile-name">Hunter Scott</span>
+              <span class="profile-status">
+                <span class="profile-online-dot" aria-hidden="true"></span>
+                <span class="profile-status-flip" aria-hidden="true">
+                  <span class="status-online">Online</span>
+                  <span class="status-username">HunterScott323</span>
+                </span>
+              </span>
+            </div>
+          </button>
+          <div class="profile-controls">
+            <button class="profile-control mic-toggle" type="button" aria-label="Mute microphone" aria-pressed="false" data-mic-toggle>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="9" y="3" width="6" height="12" rx="3"></rect>
+                <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-4 0h8"></path>
+                <path class="mic-slash" d="m4 4 16 16"></path>
+              </svg>
+            </button>
+            <button class="profile-control settings-button" type="button" aria-label="Settings">
+              <span class="settings-glyph" aria-hidden="true">&#x2699;</span>
+            </button>
+          </div>
+        </section>
+      </div>
+      <section class="friend-workspace" aria-label="Friend management">
+        <div class="demo-actions" role="group" aria-label="Friend actions">
+          <button class="friend-action pending-action" type="button">Pending</button>
+          <button class="friend-action add-friend-action" type="button">Add Friend</button>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
