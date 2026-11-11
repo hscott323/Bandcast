@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign up | Bandcast</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="auth-page">
+    <header>
+      <a class="brand-link" href="index.html" aria-label="Bandcast home">
+        <h1 aria-label="Bandcast">
+          <span class="brand-blue" aria-hidden="true">B</span>
+          <span class="brand-yellow" aria-hidden="true">A</span>
+          <span class="brand-red" aria-hidden="true">N</span>
+          <span class="brand-green" aria-hidden="true">D</span>
+          <span class="brand-blue" aria-hidden="true">C</span>
+          <span class="brand-red" aria-hidden="true">A</span>
+          <span class="brand-yellow" aria-hidden="true">S</span>
+          <span class="brand-blue" aria-hidden="true">T</span>
+        </h1>
+      </a>
+    </header>
+    <main class="auth-main">
+      <form class="auth-form" method="post">
+        <h1>Sign up</h1>
+        <label>
+          Username
+          <input type="text" name="username" autocomplete="username" required />
+        </label>
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            autocomplete="new-password"
+            required
+          />
+        </label>
+        <label>
+          Confirm password
+          <input
+            type="password"
+            name="confirm-password"
+            autocomplete="new-password"
+            required
+          />
+        </label>
+        <label class="terms-consent">
+          <input type="checkbox" name="terms" required />
+          <span>I agree to the <a href="terms.html">Terms of Service</a>.</span>
+        </label>
+        <button type="submit">Sign up</button>
+        <p class="auth-switch">
+          Already have an account? <a href="login.html">Log in</a>
+        </p>
+      </form>
+    </main>
+  </body>
+</html>

@@ -4,23 +4,71 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Bandcast</title>
-    <style>
-      :root {
-        color-scheme: dark;
-        background: #111;
-      }
-
-      html,
-      body {
-        min-height: 100%;
-        margin: 0;
-        background: #111;
-      }
-
-      body {
-        min-height: 100vh;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body></body>
+  <body>
+    <main>
+      <header>
+        <a class="brand-link" href="index.html" aria-label="Bandcast home">
+          <h1 aria-label="Bandcast">
+            <span class="brand-blue" aria-hidden="true">B</span>
+            <span class="brand-yellow" aria-hidden="true">A</span>
+            <span class="brand-red" aria-hidden="true">N</span>
+            <span class="brand-green" aria-hidden="true">D</span>
+            <span class="brand-blue" aria-hidden="true">C</span>
+            <span class="brand-red" aria-hidden="true">A</span>
+            <span class="brand-yellow" aria-hidden="true">S</span>
+            <span class="brand-blue" aria-hidden="true">T</span>
+          </h1>
+        </a>
+        <nav aria-label="Account">
+          <a href="login.html">Log in</a>
+          <a class="signup-button" href="signup.html">Sign up</a>
+        </nav>
+      </header>
+      <div class="panel-content">
+        <section class="info-card card-blue" aria-labelledby="about-title">
+          <h2 id="about-title">What is Bandcast?</h2>
+          <p>
+            Bandcast is built to help friends and family
+            communicate with ease.
+          </p>
+        </section>
+        <section class="info-card card-green" aria-labelledby="why-title">
+          <h2 id="why-title">Why Bandcast?</h2>
+          <p>
+            Bandcast offers a more user-friendly platform 
+            compared to Discord, Signal, and even iMessage. 
+            This allows people to concentrate on communication 
+            without difficulty.
+          </p>
+        </section>
+        <section class="info-card card-red" aria-labelledby="how-title">
+          <h2 id="how-title">How it works</h2>
+          <p>
+            Invite your friends and family members to 
+            become part of the Bandcast community.
+          </p>
+        </section>
+        <section class="info-card card-yellow" aria-labelledby="audience-title">
+          <h2 id="audience-title">Who it's for</h2>
+          <p>
+            Bandcast is for friends and family who want a straightforward way
+            to talk and chat privately. You must be 13 or older to use
+            Bandcast.
+          </p>
+        </section>
+        <section class="info-card card-purple" aria-labelledby="privacy-title">
+          <h2 id="privacy-title">Privacy</h2>
+          <p>
+            Your conversations will remain private. Bandcast will be developed to support
+            secure messaging for you to enjoy private conversations.
+          </p>
+        </section>
+      </div>
+      <footer class="site-footer">
+        <a href="terms.html">Terms of Service</a>
+      </footer>
+    </main>
+  </body>
 </html>
