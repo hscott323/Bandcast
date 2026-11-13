@@ -845,6 +845,30 @@ p {
   align-self: flex-end;
 }
 
+.chat-message-group {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-message-group.chat-message-outgoing {
+  align-items: flex-end;
+}
+
+.chat-message-author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #bfc2ca;
+  font-size: 0.75rem;
+}
+
+.profile-avatar.chat-message-author-avatar {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  font-size: 0.65rem;
+}
+
 .chat-message-bubble {
   max-width: 100%;
   padding: 10px 14px;
@@ -916,6 +940,8 @@ p {
   border: 1px solid #303137;
   border-radius: 12px;
   background: #202127;
+  -webkit-user-select: none;
+  user-select: none;
   transition:
     min-height 150ms ease,
     padding 150ms ease,
@@ -943,6 +969,8 @@ p {
   color: #f3f4f6;
   font: inherit;
   resize: none;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .chat-composer-input:focus-visible {

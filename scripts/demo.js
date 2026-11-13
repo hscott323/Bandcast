@@ -104,6 +104,9 @@ function createDmEntry(contact, isGroup = false) {
     entry.classList.toggle("is-active", username === activeChatUsername);
     entry.dataset.contactUsername = username;
     entry.dataset.contactName = displayName;
+  } else {
+    entry.classList.toggle("is-active", contact.id === activeGroupChatId);
+    entry.dataset.groupId = contact.id;
   }
 
   const avatarShell = document.createElement("span");
@@ -231,6 +234,21 @@ const demoConversations = {
     { sender: "me", text: "It sounds awesome, really warm tone." },
   ],
 };
+const demoGroupConversations = {
+  "sunday-rehearsal": [
+    { sender: "them", author: "Tess Nguyen", text: "How did the new arrangement feel at rehearsal?" },
+    { sender: "me", text: "Really good. The bridge is coming together." },
+    { sender: "them", author: "Ben Carter", text: "I'll bring the pedalboard on Sunday." },
+  ],
+  "gig-plans": [
+    { sender: "them", author: "Priya Shah", text: "Should we meet at the venue around 6?" },
+    { sender: "them", author: "Luis Romero", text: "That works for me. I'll bring the set list." },
+  ],
+  "the-basement": [
+    { sender: "them", author: "Nora Williams", text: "I found a quiet room for practice next week." },
+    { sender: "them", author: "Eli Brooks", text: "Nice! I'll bring the synth." },
+  ],
+};
 const demoPendingRequests = [
   { displayName: "Jordan Lee", username: "jordanlee", id: "0000030658", avatarColor: "#4b7388" },
   { displayName: "Avery Morgan", username: "avery.m", id: "0000031842", avatarColor: "#956b78" },
@@ -239,6 +257,7 @@ const demoPendingRequests = [
 const demoBlockedAccounts = [];
 const demoObjectUrls = new Set();
 let activeChatUsername = null;
+let activeGroupChatId = null;
 
 function getSortedFriends() {
   return [...demoContacts].sort((a, b) => Number(b.pinned ?? false) - Number(a.pinned ?? false));
@@ -737,6 +756,31 @@ function createChatMessageElement(message, contact) {
   return row;
 }
 
+function createGroupChatMessageElement(message, group) {
+  const row = createChatMessageElement(message, {
+    displayName: message.author || group.ownerName,
+  });
+  if (message.sender === "me") {
+    return row;
+  }
+
+  const authorName = message.author || group.ownerName;
+  const authorContact = demoContacts.find((contact) => contact.displayName === authorName);
+  const author = document.createElement("div");
+  author.className = "chat-message-author";
+  const avatar = createProfileAvatar(
+    authorName,
+    authorContact?.avatarColor || group.avatarColor,
+    "profile-avatar chat-message-author-avatar",
+  );
+  const name = document.createElement("span");
+  name.textContent = authorName;
+  author.append(avatar, name);
+  row.classList.add("chat-message-group");
+  row.prepend(author);
+  return row;
+}
+
 function formatFileSize(size) {
   if (size < 1024) {
     return `${size} B`;
@@ -757,6 +801,10 @@ function openFriendChat(contact) {
     && view.dataset.view === "chat"
     && activeChatUsername === contact.username;
   activeChatUsername = contact.username;
+  activeGroupChatId = null;
+  document.querySelectorAll(".dm-entry[data-group-id]").forEach((entry) => {
+    entry.classList.remove("is-active");
+  });
   closeProfilePopover();
   hideContextMenu();
   if (isSameOpenChat) {
@@ -820,6 +868,12 @@ function openFriendChat(contact) {
   input.maxLength = 1000;
   input.setAttribute("aria-label", `Message ${contact.displayName}`);
   input.placeholder = `Message ${contact.displayName}`;
+  const resizeChatInput = () => {
+    input.style.height = "auto";
+    const height = Math.min(input.scrollHeight, 120);
+    input.style.height = `${height}px`;
+    input.style.overflowY = input.scrollHeight > 120 ? "auto" : "hidden";
+  };
 
   const fileInput = document.createElement("input");
   fileInput.type = "file";
@@ -875,6 +929,12 @@ function openFriendChat(contact) {
   });
 
   composer.append(attachButton, input, gifButton, fileInput);
+  composer.addEventListener("click", (event) => {
+    if (event.target instanceof Element && event.target.closest("button")) {
+      return;
+    }
+    input.focus();
+  });
   composer.addEventListener("submit", (event) => {
     event.preventDefault();
     const text = input.value.trim();
@@ -890,8 +950,10 @@ function openFriendChat(contact) {
     messageList.append(createChatMessageElement(message, contact));
     messageList.scrollTop = messageList.scrollHeight;
     input.value = "";
+    resizeChatInput();
     input.focus();
   });
+  input.addEventListener("input", resizeChatInput);
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -901,7 +963,6 @@ function openFriendChat(contact) {
 
   view.append(header, messageList, composer);
   messageList.scrollTop = messageList.scrollHeight;
-  input.focus();
   document.querySelectorAll(".dm-entry[data-contact-username]").forEach((entry) => {
     entry.classList.toggle("is-active", entry.dataset.contactUsername === contact.username);
   });
@@ -912,7 +973,206 @@ function openFriendChat(contact) {
   }
 }
 
-function showGifLinkDialog(contact, chatInput, composer) {
+function closeGroupChatIfOpen(group) {
+  if (activeGroupChatId !== group.id) {
+    return;
+  }
+
+  activeGroupChatId = null;
+  const view = document.querySelector("[data-friend-view]");
+  if (view instanceof HTMLElement) {
+    view.hidden = true;
+    view.classList.remove("is-chat-view");
+    view.dataset.view = "";
+    view.replaceChildren();
+  }
+}
+
+function openGroupChat(group) {
+  const view = document.querySelector("[data-friend-view]");
+  if (!(view instanceof HTMLElement)) {
+    return;
+  }
+
+  const isSameOpenChat = !view.hidden
+    && view.dataset.view === "group-chat"
+    && activeGroupChatId === group.id;
+  closeProfilePopover();
+  hideContextMenu();
+
+  if (isSameOpenChat) {
+    activeGroupChatId = null;
+    view.hidden = true;
+    view.classList.remove("is-chat-view");
+    view.dataset.view = "";
+    view.replaceChildren();
+    document.querySelectorAll(".dm-entry[data-group-id]").forEach((entry) => {
+      entry.classList.remove("is-active");
+    });
+    const pendingButton = document.querySelector("[data-open-pending]");
+    if (pendingButton instanceof HTMLButtonElement) {
+      pendingButton.setAttribute("aria-pressed", "false");
+    }
+    return;
+  }
+
+  activeGroupChatId = group.id;
+  activeChatUsername = null;
+  document.querySelectorAll(".dm-entry[data-contact-username]").forEach((entry) => {
+    entry.classList.remove("is-active");
+  });
+
+  view.dataset.view = "group-chat";
+  view.classList.add("is-chat-view");
+  view.hidden = false;
+  view.replaceChildren();
+
+  const header = document.createElement("header");
+  header.className = "chat-header";
+  const avatar = createProfileAvatar(
+    group.displayName,
+    group.avatarColor,
+    "profile-avatar chat-header-avatar",
+  );
+  if (group.iconImage) {
+    avatar.classList.add("has-group-icon-image");
+    const image = document.createElement("img");
+    image.className = "group-icon-image";
+    image.src = group.iconImage;
+    image.alt = "";
+    avatar.replaceChildren(image);
+  }
+  const identity = document.createElement("div");
+  identity.className = "chat-header-identity";
+  const title = document.createElement("h1");
+  title.className = "friend-view-title";
+  title.id = "friend-view-title";
+  title.textContent = group.displayName;
+  identity.append(title);
+  header.append(avatar, identity);
+
+  const messageList = document.createElement("div");
+  messageList.className = "chat-message-list";
+  messageList.setAttribute("role", "log");
+  messageList.setAttribute("aria-label", `Group chat with ${group.displayName}`);
+  messageList.setAttribute("aria-live", "polite");
+
+  if (!demoGroupConversations[group.id]) {
+    demoGroupConversations[group.id] = [];
+  }
+  demoGroupConversations[group.id].forEach((message) => {
+    messageList.append(createGroupChatMessageElement(message, group));
+  });
+
+  const composer = document.createElement("form");
+  composer.className = "chat-composer";
+  const input = document.createElement("textarea");
+  input.className = "chat-composer-input";
+  input.name = "message";
+  input.rows = 1;
+  input.maxLength = 1000;
+  input.setAttribute("aria-label", `Message ${group.displayName}`);
+  input.placeholder = `Message ${group.displayName}`;
+  const resizeChatInput = () => {
+    input.style.height = "auto";
+    const height = Math.min(input.scrollHeight, 120);
+    input.style.height = `${height}px`;
+    input.style.overflowY = input.scrollHeight > 120 ? "auto" : "hidden";
+  };
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.multiple = true;
+  fileInput.hidden = true;
+  fileInput.setAttribute("aria-label", "Choose files to send");
+
+  const attachButton = document.createElement("button");
+  attachButton.type = "button";
+  attachButton.className = "chat-attach-button";
+  attachButton.setAttribute("aria-label", "Attach files");
+  const attachIcon = document.createElement("span");
+  attachIcon.className = "chat-attach-icon";
+  attachIcon.setAttribute("aria-hidden", "true");
+  attachButton.append(attachIcon);
+
+  const restoreComposerFocus = () => {
+    composer.classList.remove("is-expanded");
+    input.focus();
+  };
+  attachButton.addEventListener("click", () => {
+    composer.classList.add("is-expanded");
+    fileInput.click();
+  });
+  fileInput.addEventListener("change", () => {
+    Array.from(fileInput.files || []).forEach((file) => {
+      const fileUrl = URL.createObjectURL(file);
+      demoObjectUrls.add(fileUrl);
+      const message = {
+        sender: "me",
+        type: "attachment",
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type,
+        fileUrl,
+      };
+      demoGroupConversations[group.id].push(message);
+      messageList.append(createGroupChatMessageElement(message, group));
+    });
+    fileInput.value = "";
+    messageList.scrollTop = messageList.scrollHeight;
+    restoreComposerFocus();
+  });
+  fileInput.addEventListener("cancel", restoreComposerFocus);
+
+  const gifButton = document.createElement("button");
+  gifButton.type = "button";
+  gifButton.className = "chat-gif-button";
+  gifButton.textContent = "GIF";
+  gifButton.setAttribute("aria-label", "Send a GIF");
+  gifButton.addEventListener("click", () => {
+    composer.classList.add("is-expanded");
+    showGifLinkDialog(group, input, composer, (message) => {
+      demoGroupConversations[group.id].push(message);
+      messageList.append(createGroupChatMessageElement(message, group));
+      messageList.scrollTop = messageList.scrollHeight;
+    });
+  });
+
+  composer.append(attachButton, input, gifButton, fileInput);
+  composer.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const text = input.value.trim();
+    if (!text) {
+      return;
+    }
+
+    const message = { sender: "me", text };
+    demoGroupConversations[group.id].push(message);
+    messageList.append(createGroupChatMessageElement(message, group));
+    messageList.scrollTop = messageList.scrollHeight;
+    input.value = "";
+    resizeChatInput();
+    input.focus();
+  });
+  input.addEventListener("input", resizeChatInput);
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      composer.requestSubmit();
+    }
+  });
+
+  view.append(header, messageList, composer);
+  messageList.scrollTop = messageList.scrollHeight;
+  document.querySelectorAll(".dm-entry[data-group-id]").forEach((entry) => {
+    entry.classList.toggle("is-active", entry.dataset.groupId === group.id);
+  });
+  const pendingButton = document.querySelector("[data-open-pending]");
+  if (pendingButton instanceof HTMLButtonElement) {
+    pendingButton.setAttribute("aria-pressed", "false");
+  }
+}
+
+function showGifLinkDialog(contact, chatInput, composer, onSendGif) {
   const { overlay, dialog } = createDemoDialog("Send a GIF", "Paste a GIPHY link to share it in chat.");
   const restoreComposerFocus = () => {
     composer.classList.remove("is-expanded");
@@ -972,11 +1232,15 @@ function showGifLinkDialog(contact, chatInput, composer) {
       gifUrl,
       originalUrl: input.value.trim(),
     };
-    demoConversations[contact.username].push(message);
-    const messageList = document.querySelector(".chat-message-list");
-    if (messageList instanceof HTMLElement && activeChatUsername === contact.username) {
-      messageList.append(createChatMessageElement(message, contact));
-      messageList.scrollTop = messageList.scrollHeight;
+    if (onSendGif) {
+      onSendGif(message);
+    } else {
+      demoConversations[contact.username].push(message);
+      const messageList = document.querySelector(".chat-message-list");
+      if (messageList instanceof HTMLElement && activeChatUsername === contact.username) {
+        messageList.append(createChatMessageElement(message, contact));
+        messageList.scrollTop = messageList.scrollHeight;
+      }
     }
     overlay.remove();
     restoreComposerFocus();
@@ -1291,11 +1555,46 @@ function showLeaveGroupDialog(group) {
     const groupIndex = demoGroupChats.findIndex((entry) => entry.id === group.id);
     if (groupIndex >= 0) {
       demoGroupChats.splice(groupIndex, 1);
+      closeGroupChatIfOpen(group);
       renderDmList();
     }
     overlay.remove();
   });
   actions.append(cancelButton, leaveButton);
+  dialog.append(actions);
+  cancelButton.focus();
+}
+
+function showDeleteGroupDialog(group) {
+  if (!group.isOwner) {
+    return;
+  }
+
+  const { overlay, dialog } = createDemoDialog(
+    "Delete Group",
+    `Deleting ${group.displayName} will remove everyone from the group. This action cannot be undone. Are you sure?`,
+  );
+  dialog.setAttribute("role", "alertdialog");
+  dialog.setAttribute("aria-describedby", "delete-group-confirmation-message");
+
+  const message = dialog.querySelector(".group-dialog-message");
+  if (message instanceof HTMLElement) {
+    message.id = "delete-group-confirmation-message";
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "friend-confirmation-actions";
+  const cancelButton = createDemoDialogButton("Cancel", "friend-confirmation-cancel", () => overlay.remove());
+  const deleteButton = createDemoDialogButton("Delete Group", "friend-confirmation-remove", () => {
+    const groupIndex = demoGroupChats.findIndex((entry) => entry.id === group.id);
+    if (groupIndex >= 0) {
+      demoGroupChats.splice(groupIndex, 1);
+      closeGroupChatIfOpen(group);
+      renderDmList();
+    }
+    overlay.remove();
+  });
+  actions.append(cancelButton, deleteButton);
   dialog.append(actions);
   cancelButton.focus();
 }
@@ -1340,6 +1639,9 @@ function handleGroupContextAction(action, group) {
     case "leave-group":
       showLeaveGroupDialog(group);
       break;
+    case "delete-group":
+      showDeleteGroupDialog(group);
+      break;
     case "edit-group":
       showGroupEditDialog(group);
       break;
@@ -1364,6 +1666,7 @@ function showGroupContextMenu(event, group) {
     actions.push(
       { label: "Edit Group", action: "edit-group" },
       { label: "Change group icon", action: "change-group-icon" },
+      { label: "Delete Group", action: "delete-group" },
     );
   } else {
     actions.push({ label: "Leave Group", action: "leave-group" });
@@ -1382,33 +1685,40 @@ function renderDmList() {
   closeProfilePopover();
   dmList.replaceChildren();
 
-  const groupHeading = document.createElement("h3");
-  groupHeading.className = "dm-subheading";
-  groupHeading.textContent = "Group Chats";
-  dmList.append(groupHeading);
-  getSortedGroupChats().forEach((group) => {
-    const entry = createDmEntry(group, true);
-    entry.classList.add("has-group-context");
-    entry.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-      showGroupContextMenu(event, group);
+  const groupChats = getSortedGroupChats();
+  if (groupChats.length > 0) {
+    const groupHeading = document.createElement("h3");
+    groupHeading.className = "dm-subheading";
+    groupHeading.textContent = "Group Chats";
+    dmList.append(groupHeading);
+    groupChats.forEach((group) => {
+      const entry = createDmEntry(group, true);
+      entry.classList.add("has-group-context");
+      entry.addEventListener("click", () => openGroupChat(group));
+      entry.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+        showGroupContextMenu(event, group);
+      });
+      dmList.append(entry);
     });
-    dmList.append(entry);
-  });
+  }
 
-  const friendsHeading = document.createElement("h3");
-  friendsHeading.className = "dm-subheading";
-  friendsHeading.textContent = "Friends";
-  dmList.append(friendsHeading);
-  getSortedFriends().forEach((contact) => {
-    const entry = createDmEntry(contact);
-    entry.addEventListener("click", () => openFriendChat(contact));
-    entry.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-      showFriendContextMenu(event, contact);
+  const friends = getSortedFriends();
+  if (friends.length > 0) {
+    const friendsHeading = document.createElement("h3");
+    friendsHeading.className = "dm-subheading";
+    friendsHeading.textContent = "Friends";
+    dmList.append(friendsHeading);
+    friends.forEach((contact) => {
+      const entry = createDmEntry(contact);
+      entry.addEventListener("click", () => openFriendChat(contact));
+      entry.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+        showFriendContextMenu(event, contact);
+      });
+      dmList.append(entry);
     });
-    dmList.append(entry);
-  });
+  }
 }
 
 const dmList = document.querySelector("[data-dm-list]");
