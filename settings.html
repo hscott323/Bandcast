@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings | Bandcast</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="scripts/settings.js" defer></script>
+  </head>
+  <body>
+    <main class="settings-page">
+      <div class="settings-header">
+        <a class="settings-back" href="demo.html">Back to home</a>
+      </div>
+
+      <div class="settings-layout">
+        <div class="settings-content">
+          <section class="settings-intro" aria-labelledby="settings-intro-title">
+            <h2 id="settings-intro-title">Manage your account</h2>
+            <p>Update your profile and choose how Bandcast works for you.</p>
+            <p class="settings-demo-note">Demo settings are saved in this browser.</p>
+          </section>
+
+          <p class="settings-status" data-settings-status role="status" aria-live="polite" hidden></p>
+
+          <section class="settings-section" id="account" aria-labelledby="account-title">
+            <div class="settings-section-heading">
+              <h2 id="account-title">My Account</h2>
+              <p>Manage the information associated with your account.</p>
+            </div>
+            <form class="settings-form" data-settings-form="account" data-settings-label="Account settings">
+              <div class="settings-field-grid">
+                <label class="settings-field">
+                  <span>Display name</span>
+                  <input name="displayName" type="text" value="Hunter Scott" maxlength="40" autocomplete="name" required />
+                </label>
+                <label class="settings-field">
+                  <span>Username</span>
+                  <input name="username" type="text" value="HunterScott323" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" autocomplete="username" required />
+                </label>
+                <label class="settings-field settings-field-full">
+                  <span>Email address</span>
+                  <input name="email" type="email" autocomplete="email" placeholder="name@example.com" />
+                </label>
+              </div>
+              <div class="settings-form-actions">
+                <button class="settings-save" type="submit">Save account settings</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="settings-section" id="profile" aria-labelledby="profile-title">
+            <div class="settings-section-heading">
+              <h2 id="profile-title">Profile</h2>
+              <p>Choose what people see when they view your profile.</p>
+            </div>
+            <form class="settings-form" data-settings-form="profile" data-settings-label="Profile settings">
+              <div class="settings-avatar-editor">
+                <div class="settings-avatar-preview-row">
+                  <span class="profile-avatar settings-avatar-preview" data-profile-avatar-preview aria-hidden="true">H</span>
+                  <p>Choose a profile image or GIF, or customize your initials color.</p>
+                </div>
+                <input type="hidden" name="avatarImage" data-profile-avatar-image />
+                <div class="settings-avatar-controls">
+                  <div class="group-edit-label">
+                    <span>Avatar color</span>
+                    <span class="group-icon-control">
+                      <span class="group-icon-control-button group-icon-color-button" aria-hidden="true">
+                        <span class="group-icon-color-swatch" data-profile-avatar-swatch></span>
+                        <span>Choose color</span>
+                      </span>
+                      <input class="group-icon-control-input" type="color" name="avatarColor" value="#5865f2" data-profile-avatar-color aria-label="Profile picture color" />
+                    </span>
+                  </div>
+                  <div class="group-edit-label">
+                    <span>Profile image</span>
+                    <span class="group-icon-control">
+                      <span class="group-icon-control-button group-icon-file-button" aria-hidden="true">Choose image</span>
+                      <input class="group-icon-control-input" type="file" accept="image/*" data-profile-avatar-file aria-label="Choose profile image" />
+                    </span>
+                    <span class="group-icon-file-name" data-profile-avatar-file-name>Using default initials</span>
+                  </div>
+                  <button class="settings-avatar-reset" type="button" data-profile-avatar-reset>Restore default</button>
+                </div>
+                <p class="settings-avatar-error" data-profile-avatar-error role="alert" hidden></p>
+              </div>
+              <div class="settings-field-grid">
+                <label class="settings-field settings-field-full">
+                  <span>About me</span>
+                  <textarea name="aboutMe" rows="4" maxlength="200" placeholder="Tell people a little about yourself"></textarea>
+                  <small>Up to 200 characters.</small>
+                </label>
+              </div>
+              <div class="settings-form-actions">
+                <button class="settings-save" type="submit">Save profile</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="settings-section" id="privacy" aria-labelledby="privacy-title">
+            <div class="settings-section-heading">
+              <h2 id="privacy-title">Privacy &amp; Safety</h2>
+              <p>Control who can contact you and what others can see.</p>
+            </div>
+            <form class="settings-form" data-settings-form="privacy" data-settings-label="Privacy settings">
+              <div class="settings-toggle-list">
+                <label class="settings-toggle">
+                  <input name="showOnlineStatus" type="checkbox" checked />
+                  <span>
+                    <strong>Show my online status</strong>
+                    <small>Let friends know when you are online.</small>
+                  </span>
+                </label>
+                <label class="settings-toggle">
+                  <input name="discoverable" type="checkbox" checked />
+                  <span>
+                    <strong>Allow people to find me</strong>
+                    <small>Let people search for your username.</small>
+                  </span>
+                </label>
+              </div>
+              <div class="settings-form-actions">
+                <button class="settings-save" type="submit">Save privacy settings</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="settings-section" id="notifications" aria-labelledby="notifications-title">
+            <div class="settings-section-heading">
+              <h2 id="notifications-title">Notifications</h2>
+              <p>Pick which updates you want to receive.</p>
+            </div>
+            <form class="settings-form" data-settings-form="notifications" data-settings-label="Notification settings">
+              <div class="settings-toggle-list">
+                <label class="settings-toggle">
+                  <input name="desktopNotifications" type="checkbox" checked />
+                  <span>
+                    <strong>Desktop notifications</strong>
+                    <small>Show notifications on this device.</small>
+                  </span>
+                </label>
+                <label class="settings-toggle">
+                  <input name="emailNotifications" type="checkbox" />
+                  <span>
+                    <strong>Email notifications</strong>
+                    <small>Receive important updates by email.</small>
+                  </span>
+                </label>
+                <label class="settings-toggle">
+                  <input name="soundEffects" type="checkbox" checked />
+                  <span>
+                    <strong>Sound effects</strong>
+                    <small>Play a sound for new messages.</small>
+                  </span>
+                </label>
+                <label class="settings-toggle">
+                  <input name="mentionsOnly" type="checkbox" />
+                  <span>
+                    <strong>Only notify me about mentions</strong>
+                    <small>Skip notifications for messages that do not mention you.</small>
+                  </span>
+                </label>
+              </div>
+              <div class="settings-form-actions">
+                <button class="settings-save" type="submit">Save notification settings</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="settings-section" id="appearance" aria-labelledby="appearance-title">
+            <div class="settings-section-heading">
+              <h2 id="appearance-title">Appearance &amp; Accessibility</h2>
+              <p>Adjust the interface to make Bandcast more comfortable to use.</p>
+            </div>
+            <form class="settings-form" data-settings-form="appearance" data-settings-label="Appearance settings">
+              <div class="settings-field-grid">
+                <label class="settings-field">
+                  <span>Interface density</span>
+                  <select name="density">
+                    <option value="comfortable" selected>Comfortable</option>
+                    <option value="compact">Compact</option>
+                  </select>
+                  <small>Compact mode uses less space in the chat list.</small>
+                </label>
+              </div>
+              <div class="settings-toggle-list">
+                <label class="settings-toggle">
+                  <input name="reduceMotion" type="checkbox" />
+                  <span>
+                    <strong>Reduce motion</strong>
+                    <small>Limit animated transitions and effects.</small>
+                  </span>
+                </label>
+              </div>
+              <div class="settings-form-actions">
+                <button class="settings-save" type="submit">Save appearance settings</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

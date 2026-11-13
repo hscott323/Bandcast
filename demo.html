@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Demo | Bandcast</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" />
     <link rel="stylesheet" href="css/style.css" />
     <script src="scripts/demo.js" defer></script>
   </head>
@@ -12,7 +11,6 @@
     <main class="demo-screen" aria-label="Bandcast demo">
       <div class="dm-column">
         <aside class="dm-sidebar" aria-label="Direct Messages">
-          <h2 class="dm-heading">Direct Messages</h2>
           <div class="dm-list" data-dm-list></div>
         </aside>
         <section class="profile-dock" aria-label="Profile and controls">
@@ -45,9 +43,10 @@
       </div>
       <section class="friend-workspace" aria-label="Friend management">
         <div class="demo-actions" role="group" aria-label="Friend actions">
-          <button class="friend-action pending-action" type="button">Pending</button>
-          <button class="friend-action add-friend-action" type="button">Add Friend</button>
+          <button class="friend-action pending-action" type="button" data-open-pending aria-pressed="false">Pending</button>
+          <button class="friend-action add-friend-action" type="button" data-open-add-friend>Add Friend</button>
         </div>
+        <section class="friend-main-content" data-friend-view aria-labelledby="friend-view-title" tabindex="-1" hidden></section>
       </section>
     </main>
   </body>
