@@ -1,0 +1,8 @@
+node build.mjs
+wrangler d1 migrations apply bandcast-db --local
+
+wrangler dev --config realtime\wrangler.jsonc --port 8790 --ip 127.0.0.1 --persist-to .wrangler\state
+
+wrangler pages dev dist --port 8788 --ip 127.0.0.1 --persist-to .wrangler\state
+
+http://127.0.0.1:8788

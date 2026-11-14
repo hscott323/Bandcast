@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Settings | Bandcast</title>
     <link rel="stylesheet" href="css/style.css" />
+    <script src="scripts/mobile-preview.js"></script>
+    <script src="scripts/auth.js" defer></script>
     <script src="scripts/settings.js" defer></script>
   </head>
   <body>
     <main class="settings-page">
       <div class="settings-header">
-        <a class="settings-back" href="demo.html">Back to home</a>
+        <a class="settings-back" href="app.html">Back to home</a>
+        <nav class="settings-header-actions" aria-label="Account and legal links">
+          <a class="settings-header-terms" href="terms.html">Terms of Service</a>
+          <button type="button" data-logout>Log out</button>
+        </nav>
       </div>
 
       <div class="settings-layout">
@@ -18,7 +24,6 @@
           <section class="settings-intro" aria-labelledby="settings-intro-title">
             <h2 id="settings-intro-title">Manage your account</h2>
             <p>Update your profile and choose how Bandcast works for you.</p>
-            <p class="settings-demo-note">Demo settings are saved in this browser.</p>
           </section>
 
           <p class="settings-status" data-settings-status role="status" aria-live="polite" hidden></p>
@@ -36,17 +41,17 @@
                 </label>
                 <label class="settings-field">
                   <span>Username</span>
-                  <input name="username" type="text" value="HunterScott323" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" autocomplete="username" required />
-                </label>
-                <label class="settings-field settings-field-full">
-                  <span>Email address</span>
-                  <input name="email" type="email" autocomplete="email" placeholder="name@example.com" />
+                  <input name="username" type="text" value="" autocomplete="username" readonly />
                 </label>
               </div>
               <div class="settings-form-actions">
                 <button class="settings-save" type="submit">Save account settings</button>
               </div>
             </form>
+            <div class="settings-account-delete">
+              <button class="settings-delete-account" type="button" data-delete-account>Delete account</button>
+              <p>This permanently removes your account, messages, groups, and uploaded files.</p>
+            </div>
           </section>
 
           <section class="settings-section" id="profile" aria-labelledby="profile-title">
@@ -58,7 +63,7 @@
               <div class="settings-avatar-editor">
                 <div class="settings-avatar-preview-row">
                   <span class="profile-avatar settings-avatar-preview" data-profile-avatar-preview aria-hidden="true">H</span>
-                  <p>Choose a profile image or GIF, or customize your initials color.</p>
+                  <p>Choose a profile image or customize your initials color.</p>
                 </div>
                 <input type="hidden" name="avatarImage" data-profile-avatar-image />
                 <div class="settings-avatar-controls">
@@ -125,34 +130,6 @@
             </form>
           </section>
 
-          <section class="settings-section" id="notifications" aria-labelledby="notifications-title">
-            <div class="settings-section-heading">
-              <h2 id="notifications-title">Notifications</h2>
-              <p>Pick which updates you want to receive.</p>
-            </div>
-            <form class="settings-form" data-settings-form="notifications" data-settings-label="Notification settings">
-              <div class="settings-toggle-list">
-                <label class="settings-toggle">
-                  <input name="desktopNotifications" type="checkbox" checked />
-                  <span>
-                    <strong>Notifications on this device</strong>
-                    <small>Show notifications on this device.</small>
-                  </span>
-                </label>
-                <label class="settings-toggle">
-                  <input name="emailNotifications" type="checkbox" />
-                  <span>
-                    <strong>Email notifications</strong>
-                    <small>Receive important updates by email.</small>
-                  </span>
-                </label>
-              </div>
-              <div class="settings-form-actions">
-                <button class="settings-save" type="submit">Save notification settings</button>
-              </div>
-            </form>
-          </section>
-
           <section class="settings-section" id="appearance" aria-labelledby="appearance-title">
             <div class="settings-section-heading">
               <h2 id="appearance-title">Appearance &amp; Accessibility</h2>
@@ -175,6 +152,10 @@
           </section>
         </div>
       </div>
+
+      <footer class="settings-legal">
+        <a href="terms.html">Terms of Service</a>
+      </footer>
     </main>
   </body>
 </html>

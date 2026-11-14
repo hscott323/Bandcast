@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bandcast</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="scripts/mobile-preview.js"></script>
+    <script src="scripts/auth.js" defer></script>
+    <script src="scripts/app.js" defer></script>
+  </head>
+  <body data-page="app">
+    <main class="demo-screen" aria-label="Bandcast">
+      <div class="dm-column">
+        <aside class="dm-sidebar" aria-label="Direct Messages">
+          <div class="dm-list" data-dm-list></div>
+        </aside>
+        <section class="profile-dock" aria-label="Profile and controls">
+          <button class="profile-info" type="button" aria-label="Your profile">
+            <div class="profile-avatar" aria-hidden="true">B</div>
+            <div class="profile-details">
+              <span class="profile-name">Hunter Scott</span>
+              <span class="profile-status">
+                <span class="profile-online-dot" aria-hidden="true"></span>
+                <span class="profile-status-flip" aria-hidden="true">
+                  <span class="status-online">Online</span>
+                </span>
+              </span>
+            </div>
+          </button>
+          <div class="profile-controls">
+            <button class="profile-control settings-button" type="button" aria-label="Settings">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
+        </section>
+      </div>
+      <section class="friend-workspace" aria-label="Conversations">
+        <div class="demo-actions" role="group" aria-label="Friend actions">
+          <button class="friend-action pending-action" type="button" data-open-pending aria-pressed="false">Pending</button>
+          <button class="friend-action pending-action" type="button" data-open-add-friend>Add Friend</button>
+          <button class="friend-action pending-action" type="button" data-open-join-group>Join Group</button>
+          <button class="friend-action pending-action" type="button" data-create-group>New Group</button>
+        </div>
+        <section class="friend-main-content" data-friend-view aria-labelledby="friend-view-title" tabindex="-1" hidden></section>
+      </section>
+    </main>
+  </body>
+</html>

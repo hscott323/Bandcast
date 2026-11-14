@@ -1,0 +1,27 @@
+{
+  "name": "bandcast-realtime",
+  "main": "index.js",
+  "compatibility_date": "2026-11-13",
+  "workers_dev": false,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bandcast-db",
+      "database_id": "5dcaad63-7a40-45a4-8eb5-9cc49de211fe"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CHAT_ROOMS",
+        "class_name": "ChatRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ChatRoom"]
+    }
+  ]
+}

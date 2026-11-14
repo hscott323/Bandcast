@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Log in | Bandcast</title>
     <link rel="stylesheet" href="css/style.css" />
+    <script src="scripts/mobile-preview.js"></script>
+    <script src="scripts/auth.js" defer></script>
   </head>
   <body class="auth-page">
     <header>
@@ -22,7 +24,7 @@
       </a>
     </header>
     <main class="auth-main">
-      <div class="auth-form">
+      <form class="auth-form" data-auth-form="login">
         <h1>Log in</h1>
         <label>
           Username
@@ -37,11 +39,11 @@
             required
           />
         </label>
-        <button type="button">Log in</button>
+        <button type="submit">Log in</button>
         <p class="auth-switch">
           Don't have an account? <a href="signup.html">Sign up</a>
         </p>
-      </div>
+      </form>
     </main>
   </body>
 </html>

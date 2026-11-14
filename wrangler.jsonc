@@ -1,0 +1,29 @@
+
+{
+  "name": "bandcast",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2026-11-13",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bandcast-db",
+      "database_id": "5dcaad63-7a40-45a4-8eb5-9cc49de211fe",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "bandcast-storage"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CHAT_ROOMS",
+        "class_name": "ChatRoom",
+        "script_name": "bandcast-realtime"
+      }
+    ]
+  }
+}

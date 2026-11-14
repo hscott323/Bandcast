@@ -1,1 +1,0 @@
-npx wrangler pages deploy . --project-name=bandcast

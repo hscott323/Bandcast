@@ -1,201 +1,234 @@
-const accountSettingsKey = "bandcast.accountSettings";
-const defaultProfileAvatarColor = "#5865f2";
 const settingsStatus = document.querySelector("[data-settings-status]");
+
+async function settingsApi(path, options = {}) {
+  const response = await fetch(path, {
+    credentials: "same-origin",
+    ...options,
+    headers: {
+      ...(options.body && !(options.body instanceof FormData)
+        ? { "content-type": "application/json" }
+        : {}),
+      ...options.headers,
+    },
+  });
+  let result = null;
+  try {
+    result = await response.json();
+  } catch {
+    if (response.ok) {
+      throw new Error("The server returned an invalid response.");
+    }
+  }
+  if (response.status === 401) {
+    window.location.replace("login.html");
+    throw new Error("Please sign in again.");
+  }
+  if (!response.ok) {
+    throw new Error(result?.error || "The request could not be completed.");
+  }
+  return result;
+}
 
 function showSettingsStatus(message, isError = false) {
   if (!(settingsStatus instanceof HTMLElement)) {
     return;
   }
-
   settingsStatus.textContent = message;
   settingsStatus.hidden = false;
   settingsStatus.classList.toggle("is-error", isError);
 }
 
-function readSavedSettings() {
-  try {
-    const storedSettings = localStorage.getItem(accountSettingsKey);
-    if (!storedSettings) {
-      return {};
-    }
-
-    const parsedSettings = JSON.parse(storedSettings);
-    if (!parsedSettings || typeof parsedSettings !== "object" || Array.isArray(parsedSettings)) {
-      throw new TypeError("Saved settings must be an object.");
-    }
-    return parsedSettings;
-  } catch (error) {
-    console.error("Unable to load saved account settings.", error);
-    showSettingsStatus("Could not load saved settings. You can still update and save them.", true);
-    return {};
-  }
+function getSettingsForm(name) {
+  return document.querySelector(`[data-settings-form="${name}"]`);
 }
 
-function applySavedSettings(form, storedSettings) {
-  const sectionSettings = storedSettings[form.dataset.settingsForm];
-  if (!sectionSettings || typeof sectionSettings !== "object" || Array.isArray(sectionSettings)) {
+function updateAvatarPreview(profile) {
+  const preview = document.querySelector("[data-profile-avatar-preview]");
+  const colorInput = document.querySelector("[data-profile-avatar-color]");
+  const swatch = document.querySelector("[data-profile-avatar-swatch]");
+  const fileName = document.querySelector("[data-profile-avatar-file-name]");
+  const imageInput = document.querySelector("[data-profile-avatar-image]");
+  const displayName = getSettingsForm("account")?.elements.namedItem("displayName")?.value || "";
+  if (!(preview instanceof HTMLElement) || !(colorInput instanceof HTMLInputElement)) {
     return;
   }
 
-  Array.from(form.elements).forEach((field) => {
-    if (!field.name || !Object.prototype.hasOwnProperty.call(sectionSettings, field.name)) {
-      return;
-    }
-
-    const value = sectionSettings[field.name];
-    if (field.type === "checkbox") {
-      field.checked = value === true;
-    } else if (typeof value === "string") {
-      field.value = value;
-    }
-  });
-}
-
-function collectFormSettings(form) {
-  const values = {};
-  Array.from(form.elements).forEach((field) => {
-    if (!field.name) {
-      return;
-    }
-    values[field.name] = field.type === "checkbox" ? field.checked : field.value;
-  });
-  return values;
-}
-
-function initializeProfileAvatarEditor() {
-  const form = document.querySelector('[data-settings-form="profile"]');
-  if (!(form instanceof HTMLFormElement)) {
-    return;
+  const imageUrl = profile?.avatarUrl || "";
+  preview.replaceChildren();
+  preview.style.setProperty("--avatar-color", colorInput.value);
+  preview.textContent = Array.from(displayName.trim())[0]?.toUpperCase() || "?";
+  preview.classList.toggle("has-profile-image", Boolean(imageUrl));
+  if (imageUrl) {
+    const image = document.createElement("img");
+    image.className = "profile-avatar-image";
+    image.src = imageUrl;
+    image.alt = "";
+    preview.replaceChildren(image);
   }
-
-  const colorInput = form.querySelector("[data-profile-avatar-color]");
-  const imageInput = form.querySelector("[data-profile-avatar-image]");
-  const fileInput = form.querySelector("[data-profile-avatar-file]");
-  const fileName = form.querySelector("[data-profile-avatar-file-name]");
-  const preview = form.querySelector("[data-profile-avatar-preview]");
-  const swatch = form.querySelector("[data-profile-avatar-swatch]");
-  const resetButton = form.querySelector("[data-profile-avatar-reset]");
-  const errorMessage = form.querySelector("[data-profile-avatar-error]");
-  const displayNameInput = document.querySelector('[data-settings-form="account"] [name="displayName"]');
-
-  if (!(colorInput instanceof HTMLInputElement)
-    || !(imageInput instanceof HTMLInputElement)
-    || !(fileInput instanceof HTMLInputElement)
-    || !(fileName instanceof HTMLElement)
-    || !(preview instanceof HTMLElement)
-    || !(swatch instanceof HTMLElement)
-    || !(resetButton instanceof HTMLButtonElement)
-    || !(errorMessage instanceof HTMLElement)) {
-    return;
-  }
-
-  const updatePreview = () => {
-    const imageSource = imageInput.value.startsWith("data:image/") ? imageInput.value : "";
-    preview.style.setProperty("--avatar-color", colorInput.value);
-    preview.classList.toggle("has-profile-image", Boolean(imageSource));
-    preview.replaceChildren();
-
-    if (imageSource) {
-      const image = document.createElement("img");
-      image.className = "profile-avatar-image";
-      image.src = imageSource;
-      image.alt = "";
-      preview.append(image);
-    } else {
-      const displayName = displayNameInput instanceof HTMLInputElement ? displayNameInput.value.trim() : "";
-      const firstCharacter = Array.from(displayName)[0];
-      preview.textContent = firstCharacter ? Array.from(firstCharacter.toUpperCase())[0] || "?" : "?";
-    }
-
+  if (swatch instanceof HTMLElement) {
     swatch.style.backgroundColor = colorInput.value;
-  };
+  }
+  if (fileName instanceof HTMLElement) {
+    fileName.textContent = imageUrl ? "Custom image saved" : "Using default initials";
+  }
+  if (imageInput instanceof HTMLInputElement) {
+    imageInput.value = imageUrl;
+  }
+}
 
-  const showAvatarError = (message) => {
-    errorMessage.textContent = message;
-    errorMessage.hidden = false;
-  };
+async function loadSettings() {
+  try {
+    const [{ user }, { profile }, { settings }] = await Promise.all([
+      settingsApi("/api/auth/me"),
+      settingsApi("/api/profile"),
+      settingsApi("/api/settings"),
+    ]);
+    const accountForm = getSettingsForm("account");
+    const profileForm = getSettingsForm("profile");
+    if (accountForm instanceof HTMLFormElement) {
+      accountForm.elements.namedItem("displayName").value = profile.displayName;
+      accountForm.elements.namedItem("username").value = profile.username;
+    }
+    if (profileForm instanceof HTMLFormElement) {
+      profileForm.elements.namedItem("aboutMe").value = profile.bio;
+      profileForm.elements.namedItem("avatarColor").value = profile.avatarColor;
+    }
+    for (const [section, values] of Object.entries({
+      privacy: {
+        showOnlineStatus: settings.showOnlineStatus,
+        discoverable: settings.discoverable,
+      },
+      appearance: { reduceMotion: settings.reduceMotion },
+    })) {
+      const form = getSettingsForm(section);
+      if (form instanceof HTMLFormElement) {
+        Object.entries(values).forEach(([name, value]) => {
+          const field = form.elements.namedItem(name);
+          if (field instanceof HTMLInputElement) {
+            field.checked = value;
+          }
+        });
+      }
+    }
+    document.querySelector(".profile-name")?.replaceChildren(document.createTextNode(user.displayName));
+    updateAvatarPreview(profile);
+    applyAppearance(settings.reduceMotion);
+    bindSettingsForms(profile);
+  } catch (error) {
+    if (error instanceof Error && error.message !== "Please sign in again.") {
+      showSettingsStatus(error.message, true);
+    }
+  }
+}
 
-  colorInput.addEventListener("input", updatePreview);
-  displayNameInput?.addEventListener("input", updatePreview);
-  fileInput.addEventListener("change", () => {
+function collectSettings() {
+  const getChecked = (section, name) => {
+    const field = getSettingsForm(section)?.elements.namedItem(name);
+    return field instanceof HTMLInputElement && field.checked;
+  };
+  return {
+    showOnlineStatus: getChecked("privacy", "showOnlineStatus"),
+    discoverable: getChecked("privacy", "discoverable"),
+    reduceMotion: getChecked("appearance", "reduceMotion"),
+  };
+}
+
+function applyAppearance(reduceMotion) {
+  document.documentElement.classList.toggle("reduce-motion", reduceMotion);
+}
+
+function bindSettingsForms(profile) {
+  const accountForm = getSettingsForm("account");
+  accountForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const displayName = accountForm.elements.namedItem("displayName").value.trim();
+    try {
+      await settingsApi("/api/profile", {
+        method: "PATCH",
+        body: JSON.stringify({
+          displayName,
+          bio: profile.bio,
+          avatarColor: profile.avatarColor,
+        }),
+      });
+      profile.displayName = displayName;
+      showSettingsStatus("Account settings saved.");
+    } catch (error) {
+      showSettingsStatus(error.message, true);
+    }
+  });
+
+  const profileForm = getSettingsForm("profile");
+  profileForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const displayName = accountForm.elements.namedItem("displayName").value.trim();
+    const bio = profileForm.elements.namedItem("aboutMe").value;
+    const avatarColor = profileForm.elements.namedItem("avatarColor").value;
+    try {
+      const result = await settingsApi("/api/profile", {
+        method: "PATCH",
+        body: JSON.stringify({ displayName, bio, avatarColor }),
+      });
+      Object.assign(profile, result.profile);
+      updateAvatarPreview(profile);
+      showSettingsStatus("Profile saved.");
+    } catch (error) {
+      showSettingsStatus(error.message, true);
+    }
+  });
+
+  const settingsSections = ["privacy", "appearance"];
+  settingsSections.forEach((section) => {
+    const form = getSettingsForm(section);
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const settings = collectSettings();
+      try {
+        await settingsApi("/api/settings", {
+          method: "PATCH",
+          body: JSON.stringify(settings),
+        });
+        applyAppearance(settings.reduceMotion);
+        showSettingsStatus(`${form.dataset.settingsLabel} saved.`);
+      } catch (error) {
+        showSettingsStatus(error.message, true);
+      }
+    });
+  });
+
+  const colorInput = profileForm?.elements.namedItem("avatarColor");
+  const fileInput = document.querySelector("[data-profile-avatar-file]");
+  colorInput?.addEventListener("input", () => updateAvatarPreview(profile));
+  accountForm?.elements.namedItem("displayName")?.addEventListener("input", () => updateAvatarPreview(profile));
+  fileInput?.addEventListener("change", async () => {
     const file = fileInput.files?.[0];
     if (!file) {
       return;
     }
-    if (!file.type.startsWith("image/")) {
-      showAvatarError("Choose an image file.");
-      fileInput.value = "";
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      if (typeof reader.result !== "string" || !reader.result.startsWith("data:image/")) {
-        showAvatarError("Could not read that image. Choose a different file.");
-        return;
-      }
-
-      imageInput.value = reader.result;
-      fileName.textContent = file.name;
-      errorMessage.hidden = true;
-      updatePreview();
-    });
-    reader.addEventListener("error", () => {
-      showAvatarError("Could not read that image. Choose a different file.");
-    });
-    reader.readAsDataURL(file);
-  });
-
-  resetButton.addEventListener("click", () => {
-    colorInput.value = defaultProfileAvatarColor;
-    imageInput.value = "";
-    fileInput.value = "";
-    fileName.textContent = "Using default initials";
-    errorMessage.hidden = true;
-    updatePreview();
-  });
-
-  fileName.textContent = imageInput.value.startsWith("data:image/")
-    ? "Custom image saved"
-    : "Using default initials";
-  updatePreview();
-}
-
-function applyAppearanceSettings(appearance) {
-  document.documentElement.classList.toggle("compact-interface", appearance.density === "compact");
-  document.documentElement.classList.toggle("reduce-motion", appearance.reduceMotion === true);
-}
-
-let savedSettings = readSavedSettings();
-const settingsForms = document.querySelectorAll("[data-settings-form]");
-
-settingsForms.forEach((form) => {
-  if (!(form instanceof HTMLFormElement)) {
-    return;
-  }
-  applySavedSettings(form, savedSettings);
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const updatedSettings = {
-      ...savedSettings,
-      [form.dataset.settingsForm]: collectFormSettings(form),
-    };
-
+    const formData = new FormData();
+    formData.set("file", file);
     try {
-      localStorage.setItem(accountSettingsKey, JSON.stringify(updatedSettings));
+      const result = await settingsApi("/api/profile/avatar", { method: "POST", body: formData });
+      profile.avatarUrl = result.file.url;
+      updateAvatarPreview(profile);
+      showSettingsStatus("Profile picture updated.");
     } catch (error) {
-      console.error("Unable to save account settings.", error);
-      showSettingsStatus("Could not save settings in this browser. Check available storage and try again.", true);
-      return;
+      showSettingsStatus(error.message, true);
+    } finally {
+      fileInput.value = "";
     }
-
-    savedSettings = updatedSettings;
-    if (form.dataset.settingsForm === "appearance") {
-      applyAppearanceSettings(updatedSettings.appearance);
-    }
-    showSettingsStatus(`${form.dataset.settingsLabel} saved in this browser.`);
   });
-});
 
-initializeProfileAvatarEditor();
-applyAppearanceSettings(savedSettings.appearance || {});
+  document.querySelector("[data-profile-avatar-reset]")?.addEventListener("click", async () => {
+    try {
+      await settingsApi("/api/profile/avatar", { method: "DELETE" });
+      profile.avatarUrl = null;
+      updateAvatarPreview(profile);
+      showSettingsStatus("Profile picture restored to initials.");
+    } catch (error) {
+      showSettingsStatus(error.message, true);
+    }
+  });
+}
+
+loadSettings();

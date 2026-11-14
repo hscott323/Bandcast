@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Bandcast</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        background: #111;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: #111;
+      }
+
+      body {
+        display: grid;
+        overflow: hidden;
+        place-items: center;
+      }
+
+      .mobile-preview-frame {
+        display: block;
+        width: min(390px, 100vw);
+        height: 100vh;
+        height: 100dvh;
+        border: 0;
+        background: #111;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe
+      class="mobile-preview-frame"
+      id="preview-frame"
+      title="Bandcast"
+    ></iframe>
+    <script>
+      (() => {
+        const params = new URLSearchParams(window.location.search);
+        const fallback = new URL("index.html", window.location.href);
+
+        let pageUrl;
+        try {
+          pageUrl = new URL(params.get("page") || fallback.href, window.location.href);
+        } catch {
+          pageUrl = fallback;
+        }
+        if (pageUrl.origin !== window.location.origin) {
+          pageUrl = fallback;
+        }
+
+        const frame = document.getElementById("preview-frame");
+        frame.src = pageUrl.href;
+
+        frame.addEventListener("load", () => {
+          try {
+            const current = new URL(frame.contentWindow.location.href);
+            if (current.origin !== window.location.origin) {
+              return;
+            }
+            if (current.pathname.endsWith("/mobile-preview.html")) {
+              return;
+            }
+
+            const visibleUrl = new URL(current.href);
+            visibleUrl.searchParams.set("mobile", "1");
+            window.history.replaceState(null, "", visibleUrl.href);
+            document.title = frame.contentDocument.title || document.title;
+          } catch {
+            // Keep the preview URL if the frame is not readable.
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

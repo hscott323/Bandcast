@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Bandcast</title>
     <link rel="stylesheet" href="css/style.css" />
+    <script src="scripts/mobile-preview.js"></script>
+    <script src="scripts/auth.js" defer></script>
   </head>
-  <body>
+  <body data-page="home">
     <main>
       <header>
-        <a class="demo-button" href="demo.html">Try the demo</a>
+        <a class="demo-button" href="login.html">Open Bandcast</a>
         <a class="brand-link" href="index.html" aria-label="Bandcast home">
           <h1 aria-label="Bandcast">
             <span class="brand-blue" aria-hidden="true">B</span>
@@ -22,7 +24,7 @@
             <span class="brand-blue" aria-hidden="true">T</span>
           </h1>
         </a>
-        <nav aria-label="Account">
+        <nav class="home-account-nav" aria-label="Account">
           <a href="login.html">Log in</a>
           <a class="signup-button" href="signup.html">Sign up</a>
         </nav>
@@ -62,8 +64,9 @@
         <section class="info-card card-purple" aria-labelledby="privacy-title">
           <h2 id="privacy-title">Privacy</h2>
           <p>
-            Your conversations will remain private. Bandcast will be developed to support
-            secure messaging for you to enjoy private conversations.
+            Direct conversations are limited to accepted friends, and group conversations
+            are available to their current members. Messages and uploads are stored so you
+            can access them across sessions.
           </p>
         </section>
       </div>
