@@ -709,6 +709,137 @@ p {
   line-height: 1.5;
 }
 
+.image-crop-overlay {
+  position: fixed;
+  z-index: 1600;
+  inset: 0;
+  display: grid;
+  overflow: auto;
+  padding: 20px;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.image-crop-dialog {
+  display: grid;
+  width: min(100%, 380px);
+  box-sizing: border-box;
+  gap: 16px;
+  padding: 22px;
+  border: 1px solid #3a3e4b;
+  border-radius: 14px;
+  background: #202127;
+  color: #f3f4f6;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.image-crop-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.image-crop-hint {
+  margin: 0;
+  color: #aeb1ba;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.image-crop-viewport {
+  position: relative;
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  justify-self: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #111;
+  box-shadow: 0 0 0 2px #41434d;
+  cursor: grab;
+  touch-action: none;
+}
+
+.image-crop-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.image-crop-viewport:focus-visible {
+  outline: 2px solid #8ab4f8;
+  outline-offset: 4px;
+}
+
+.image-crop-image {
+  position: absolute;
+  max-width: none;
+  max-height: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.image-crop-zoom {
+  display: grid;
+  gap: 8px;
+  color: #c4c6ce;
+  font-size: 0.85rem;
+}
+
+.image-crop-zoom input {
+  width: 100%;
+  accent-color: #5663ed;
+}
+
+.image-crop-error {
+  margin: 0;
+  color: #ff9696;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.image-crop-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.image-crop-actions button {
+  min-height: 40px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.image-crop-cancel {
+  border: 1px solid #41434d;
+  background: #191a1f;
+  color: #f3f4f6;
+}
+
+.image-crop-cancel:hover,
+.image-crop-cancel:focus-visible {
+  background: #303137;
+  outline: 2px solid #8ab4f8;
+  outline-offset: 2px;
+}
+
+.image-crop-save {
+  border: 1px solid #5663ed;
+  background: #5663ed;
+  color: #fff;
+  font-weight: 600;
+}
+
+.image-crop-save:hover,
+.image-crop-save:focus-visible {
+  border-color: #6874f0;
+  background: #6874f0;
+  outline: 2px solid #8ab4f8;
+  outline-offset: 2px;
+}
+
+.image-crop-save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .group-dialog-message {
   white-space: pre-line;
 }
@@ -1099,6 +1230,7 @@ p {
   height: 100%;
   border-radius: inherit;
   object-fit: cover;
+  object-position: center;
 }
 
 .group-edit-label {
@@ -1600,6 +1732,7 @@ p {
   height: 30px;
   flex: none;
   box-sizing: border-box;
+  overflow: hidden;
   place-items: center;
   padding: 0;
   border-radius: 50%;
@@ -1631,6 +1764,7 @@ p {
   height: 100%;
   border-radius: inherit;
   object-fit: cover;
+  object-position: center;
 }
 
 .profile-details {
@@ -1821,7 +1955,12 @@ p {
 }
 
 .settings-legal {
-  display: none;
+  display: block;
+  text-align: center;
+}
+
+.settings-legal a {
+  color: #8ab4f8;
 }
 
 .settings-header {
@@ -1849,38 +1988,6 @@ p {
 }
 
 .settings-header a:focus-visible {
-  outline: 2px solid #8ab4f8;
-  outline-offset: 3px;
-}
-
-.settings-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.settings-header-actions a {
-  color: #c4c6ce;
-}
-
-.settings-header-actions button {
-  min-height: 38px;
-  padding: 8px 12px;
-  border: 1px solid #41434d;
-  border-radius: 8px;
-  background: #191a1f;
-  color: #f3f4f6;
-  font: inherit;
-}
-
-.settings-header-actions button:hover,
-.settings-header-actions button:focus-visible {
-  background: #303137;
-  outline: 2px solid #8ab4f8;
-  outline-offset: 2px;
-}
-
-.settings-header-actions a:focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 3px;
 }
@@ -2067,13 +2174,36 @@ p {
   background: #6874f0;
 }
 
+.settings-account-actions {
+  display: flex;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #303137;
+}
+
+.settings-logout {
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid #41434d;
+  border-radius: 8px;
+  background: #191a1f;
+  color: #f3f4f6;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.settings-logout:hover,
+.settings-logout:focus-visible {
+  background: #303137;
+  outline: 2px solid #8ab4f8;
+  outline-offset: 2px;
+}
+
 .settings-account-delete {
   display: grid;
   justify-items: start;
   gap: 8px;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #303137;
+  margin-top: 16px;
 }
 
 .settings-account-delete p {
@@ -2120,19 +2250,6 @@ p {
   .settings-page {
     gap: 20px;
     padding: 20px 16px;
-  }
-
-  .settings-header-terms {
-    display: none;
-  }
-
-  .settings-legal {
-    display: block;
-    text-align: center;
-  }
-
-  .settings-legal a {
-    color: #8ab4f8;
   }
 }
 

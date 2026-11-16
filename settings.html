@@ -6,6 +6,7 @@
     <title>Settings | Bandcast</title>
     <link rel="stylesheet" href="css/style.css" />
     <script src="scripts/mobile-preview.js"></script>
+    <script src="scripts/image-crop.js" defer></script>
     <script src="scripts/auth.js" defer></script>
     <script src="scripts/settings.js" defer></script>
   </head>
@@ -13,10 +14,6 @@
     <main class="settings-page">
       <div class="settings-header">
         <a class="settings-back" href="app.html">Back to home</a>
-        <nav class="settings-header-actions" aria-label="Account and legal links">
-          <a class="settings-header-terms" href="terms.html">Terms of Service</a>
-          <button type="button" data-logout>Log out</button>
-        </nav>
       </div>
 
       <div class="settings-layout">
@@ -48,6 +45,9 @@
                 <button class="settings-save" type="submit">Save account settings</button>
               </div>
             </form>
+            <div class="settings-account-actions">
+              <button class="settings-logout" type="button" data-logout>Log out</button>
+            </div>
             <div class="settings-account-delete">
               <button class="settings-delete-account" type="button" data-delete-account>Delete account</button>
               <p>This permanently removes your account, messages, groups, and uploaded files.</p>

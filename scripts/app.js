@@ -661,7 +661,19 @@ async function openGroupManager(conversation) {
       iconInput.type = "file";
       iconInput.accept = "image/*";
       const iconButton = makeAction("Change group icon", () => iconInput.click());
-      iconInput.addEventListener("change", () => updateGroupIcon(conversation, iconInput.files?.[0], overlay));
+      iconInput.addEventListener("change", async () => {
+        const file = iconInput.files?.[0];
+        iconInput.value = "";
+        if (!file) {
+          return;
+        }
+        const cropped = await window.openImageCropper(file, {
+          title: "Adjust group icon",
+        });
+        if (cropped) {
+          await updateGroupIcon(conversation, cropped, overlay);
+        }
+      });
       actions.append(iconButton, iconInput);
       const bans = result.banned || [];
       if (bans.length) {

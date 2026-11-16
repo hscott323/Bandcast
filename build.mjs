@@ -20,6 +20,6 @@ if (existsSync(cssDirectory)) {
 
 const scriptsOutput = join(output, "scripts");
 mkdirSync(scriptsOutput, { recursive: true });
-for (const name of ["app.js", "auth.js", "mobile-preview.js", "settings.js"]) {
+for (const name of ["app.js", "auth.js", "image-crop.js", "mobile-preview.js", "settings.js"]) {
   cpSync(join(root, "scripts", name), join(scriptsOutput, name));
 }

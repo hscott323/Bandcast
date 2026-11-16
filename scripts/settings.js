@@ -202,11 +202,18 @@ function bindSettingsForms(profile) {
   accountForm?.elements.namedItem("displayName")?.addEventListener("input", () => updateAvatarPreview(profile));
   fileInput?.addEventListener("change", async () => {
     const file = fileInput.files?.[0];
+    fileInput.value = "";
     if (!file) {
       return;
     }
+    const cropped = await window.openImageCropper(file, {
+      title: "Adjust your profile picture",
+    });
+    if (!cropped) {
+      return;
+    }
     const formData = new FormData();
-    formData.set("file", file);
+    formData.set("file", cropped);
     try {
       const result = await settingsApi("/api/profile/avatar", { method: "POST", body: formData });
       profile.avatarUrl = result.file.url;
@@ -214,8 +221,6 @@ function bindSettingsForms(profile) {
       showSettingsStatus("Profile picture updated.");
     } catch (error) {
       showSettingsStatus(error.message, true);
-    } finally {
-      fileInput.value = "";
     }
   });
 
